@@ -37,7 +37,7 @@ namespace Server
             // To Write the Received data
             this.Invoke((MethodInvoker)delegate 
             {
-                textBox1.AppendText(">>" + m + Environment.NewLine);
+                textBox1.AppendText($"{DateTime.Now.ToString("[dd MMMM yyyy] HH:mm:ss")} {Environment.NewLine}>> {m}{Environment.NewLine}{Environment.NewLine}");
             });
         }
 
