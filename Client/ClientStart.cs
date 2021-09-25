@@ -15,21 +15,18 @@ namespace Client
             Application.SetCompatibleTextRenderingDefault(false);
 
             formLogin formLogin = new formLogin();
-            Boolean flag = true;
 
                 if (formLogin.ShowDialog() == DialogResult.OK)
                 {
-                    if (formLogin.Textb() != "")
+                    if (formLogin.GetName() != "")
                     {
-                        flag = false;
                         formMainCl form = new formMainCl();
-                        form.setName(formLogin.Textb());
+                        form.setName(formLogin.GetName());
                         Application.Run(form);
                     }
                     else
                     {
                         formLogin.slblU("Please enter");
-                        //MessageBox.Show("Please enter");
                     }
                 }
                 else

@@ -46,8 +46,9 @@ namespace Client
                     chat.Clear();
                 }
             }
-            catch (Exception er)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 btnConnect.Enabled = true;
             }
 
@@ -73,9 +74,9 @@ namespace Client
                 clientThread = new Thread(getMessage);
                 clientThread.Start();
             }
-            catch (Exception er)
+            catch (Exception ex)
             {
-                MessageBox.Show("Server Not Started");
+                MessageBox.Show(ex.Message + "Server Not Started");
             }
         }
 
@@ -122,6 +123,11 @@ namespace Client
                             readData = "" + parts[1];
                             msg();
                             break;
+                        default:
+                            readData = "" + parts[0];
+                            msg();
+                            break;
+
                     }
 
                     if (readData[0].Equals('\0'))
@@ -148,7 +154,6 @@ namespace Client
                 btnConnect.Enabled = true;
                 Console.WriteLine(e);
             }
-
         }
 
         private void msg()
@@ -169,7 +174,7 @@ namespace Client
                     clientThread.Abort();
                     clientSocket.Close();
                 }
-                catch (Exception ee) { }
+                catch (Exception ex) { MessageBox.Show(ex.Message); }
 
                 Application.ExitThread();
             }

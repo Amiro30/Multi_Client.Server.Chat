@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace Server
 {
@@ -37,7 +32,7 @@ namespace Server
             startServer();
         }
 
-        public void updateUI(String m)
+        public void UpdateUI(String m)
         {
             // To Write the Received data
             this.Invoke((MethodInvoker)delegate 
@@ -49,8 +44,8 @@ namespace Server
         public async void startServer()
         {
             listener.Start();
-            updateUI("Server Started at " + listener.LocalEndpoint);
-            updateUI("Waiting for Clients");
+            UpdateUI("Server Started at " + listener.LocalEndpoint);
+            UpdateUI("Waiting for Clients");
             try
             {
                 int counter = 0;
@@ -71,7 +66,7 @@ namespace Server
                     /* add to dictionary, listbox and send userList  */
                     clientList.Add(userName, client);
                     listBox1.Items.Add(userName);
-                    updateUI("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
+                    UpdateUI("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
                     announce(userName + " Joined ", userName, false);
 
                     await Task.Delay(1000).ContinueWith(t => sendUsersList());
@@ -102,20 +97,32 @@ namespace Server
 
                     if (flag)
                     {
-                        //broadcastBytes = Encoding.ASCII.GetBytes("gChat|*|" + uName + " says : " + msg);
+                        switch (msg)
+                        {
+                            case "DATE":
+                                chat.Add($" Command: {msg}{Environment.NewLine} >> Response: {DateTime.Now.ToString("dd MMMM yyyy")}");
+                                break;
 
-                        chat.Add("chat");
-                        chat.Add(uName + " says : " + msg);
+                            case "TIME":
+                                chat.Add($" Command: {msg}{Environment.NewLine} >> Response: {DateTime.Now.ToString("HH:mm:ss")}");
+                                break;
+
+                            default:
+                                chat.Add("chat");
+                                chat.Add(uName + " says : " + msg);
+                                break;
+                        }
+
+                        //chat.Add("chat");
+                        //chat.Add(uName + " says : " + msg);
+
                         broadcastBytes = ObjectToByteArray(chat);
                     }
                     else
                     {
-                        //broadcastBytes = Encoding.ASCII.GetBytes("gChat|*|" + msg);
-
                         chat.Add("chat");
                         chat.Add(msg);
                         broadcastBytes = ObjectToByteArray(chat);
-
                     }
 
                     broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
@@ -123,9 +130,9 @@ namespace Server
                     chat.Clear();
                 }
             }
-            catch (Exception er)
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
         }  
 
@@ -155,7 +162,6 @@ namespace Server
         public void ServerReceive(TcpClient client, String userName)
         {
             byte[] data = new byte[1000];
-            String text = null;
             while (true)
             {
                 try
@@ -176,15 +182,16 @@ namespace Server
                             break;
 
                         case "some case":
-                            
                             break;
                     }
 
                     parts.Clear();
                 }
-                catch (Exception r)
+                catch (Exception ex)
                 {
-                    updateUI("Client Disconnected: " + userName);
+                    MessageBox.Show(ex.Message);
+
+                    UpdateUI("Client Disconnected: " + userName);
                     announce("Client Disconnected: " + userName + "$", userName, false);
                     clientList.Remove(userName);
 
@@ -203,7 +210,7 @@ namespace Server
             try
             {
                 listener.Stop();
-                updateUI("Server Stopped");
+                UpdateUI("Server Stopped");
                 foreach (var Item in clientList)
                 {
                     TcpClient broadcastSocket;
@@ -211,9 +218,9 @@ namespace Server
                     broadcastSocket.Close();
                 }
             }
-            catch (SocketException er)
+            catch (SocketException ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
 
             //cancellation.Cancel();
@@ -245,8 +252,9 @@ namespace Server
                     users.Clear();
                 }
             }
-            catch (SocketException se)
+            catch (SocketException ex)
             {
+                MessageBox.Show(ex.Message);
             }
         }
 
