@@ -19,6 +19,7 @@ namespace Server
         Dictionary<string, TcpClient> clientList = new Dictionary<string, TcpClient>();
         CancellationTokenSource cancellation = new CancellationTokenSource();
         List<string> chat = new List<string>();
+        bool isLogin = false;
 
         public Server()
         {
@@ -56,29 +57,42 @@ namespace Server
                     client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellation.Token);
 
                     /* get username */
-                    byte[] name = new byte[50];
+                    byte[] creds = new byte[1000];
                     NetworkStream stream = client.GetStream(); 
-                    stream.Read(name, 0, name.Length); 
+                    stream.Read(creds, 0, creds.Length);
 
-                    String userName = Encoding.ASCII.GetString(name); // Converts Bytes Received to String
-                    userName = userName.Substring(0, userName.IndexOf("$"));
+                    var parts = (List<string>)ByteArrayToObject(creds);
+                    var userName = parts[0];
+                    var pwd = parts[1];
 
-                    /* add to dictionary, listbox and send userList  */
-                    clientList.Add(userName, client);
-                    listBox1.Items.Add(userName);
-                    UpdateUI("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
-                    announce(userName + " Joined ", userName, false);
+                    if (isLogin = Auth.Login(userName, pwd))
+                    {
+                        /* add to dictionary, listbox and send userList  */
+                        clientList.Add(userName, client);
+                        listBox1.Items.Add(userName);
+                        UpdateUI("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
+                        announce(userName + " Joined ", userName, false);
 
-                    await Task.Delay(1000).ContinueWith(t => sendUsersList());
+                        await Task.Delay(1000).ContinueWith(t => sendUsersList());
 
 
-                    var c = new Thread(() => ServerReceive(client, userName));
-                    c.Start();
-
+                        var c = new Thread(() => ServerReceive(client, userName));
+                        c.Start();
+                    }
+                    else
+                    {
+                        chat.Add("denied");
+                        chat.Add($"{userName}:  Access Denied.");
+                        var  broadcastBytes = ObjectToByteArray(chat);
+                        stream.Write(broadcastBytes, 0, broadcastBytes.Length);
+                        stream.Flush();
+                        chat.Clear();
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 listener.Stop();
             }
 
@@ -112,9 +126,6 @@ namespace Server
                                 chat.Add(uName + " says : " + msg);
                                 break;
                         }
-
-                        //chat.Add("chat");
-                        //chat.Add(uName + " says : " + msg);
 
                         broadcastBytes = ObjectToByteArray(chat);
                     }

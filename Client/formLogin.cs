@@ -15,8 +15,14 @@ namespace Client
 
         public String GetName()
         {
-            return textBox1.Text;
+            return logIn.Text;
         }
+
+        public String GetPass()
+        {
+            return password.Text;
+        }
+
 
         public void slblU(String v)
         {
@@ -30,6 +36,11 @@ namespace Client
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+        }
+
+        private void lblName_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

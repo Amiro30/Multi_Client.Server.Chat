@@ -18,11 +18,11 @@ namespace Client
 
                 if (formLogin.ShowDialog() == DialogResult.OK)
                 {
-                    if (formLogin.GetName() != "")
+                    if (formLogin.GetName() != "" && formLogin.GetPass() != "")
                     {
                         formMainCl form = new formMainCl();
-                        form.setName(formLogin.GetName());
-                        Application.Run(form);
+                        form.setCredentials(formLogin.GetName(), formLogin.GetPass());
+                    Application.Run(form);
                     }
                     else
                     {

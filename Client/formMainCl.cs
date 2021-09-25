@@ -16,13 +16,14 @@ namespace Client
         public NetworkStream serverStream = default(NetworkStream);
         string readData = null;
         Thread clientThread;
-        String name = null;
+        String _name = null;
+        String _pass = null;
         List<string> chat = new List<string>();
 
-        public void setName(String title)
+        public void setCredentials(string login, string pass)
         {
-            this.Text = title;
-            name = title;
+            _name = login;
+            _pass = pass;
         }
 
         public formMainCl()
@@ -65,7 +66,12 @@ namespace Client
 
                 serverStream = clientSocket.GetStream();
 
-                byte[] outStream = Encoding.ASCII.GetBytes(name + "$");
+                //byte[] outStream = Encoding.ASCII.GetBytes(_name + "$" + _pass + "*");
+                chat.Add(_name);
+                chat.Add(_pass);
+                byte[] outStream = ObjectToByteArray(chat);
+
+
                 serverStream.Write(outStream, 0, outStream.Length);
                 serverStream.Flush();
                 btnConnect.Enabled = false;
@@ -122,7 +128,16 @@ namespace Client
                         case "chat":
                             readData = "" + parts[1];
                             msg();
+                            break; 
+
+                        case "denied":
+                            readData = "" + parts[1];
+                            msg();
+
+                            Application.Restart();
+                            Environment.Exit(0);
                             break;
+
                         default:
                             readData = "" + parts[0];
                             msg();
