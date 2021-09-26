@@ -5,8 +5,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Server.Models;
+using Server.Operators;
 
-namespace Server
+
+namespace Server.Operators
 {
     class ServerOperator
     {
@@ -23,6 +26,9 @@ namespace Server
         //resets the token when the server restarts
         CancellationTokenSource cancellation = new CancellationTokenSource();
         Helper sHelper = new Helper();
+        DbOperator dbOperator = new DbOperator();
+        private int userId = 1;
+        private int msgId = 1;
 
         Dictionary<string, TcpClient> clientList = new Dictionary<string, TcpClient>();
         List<string> chat = new List<string>();
@@ -34,11 +40,9 @@ namespace Server
 
             try
             {
-                int counter = 0;
                 while (true)
                 {
-                    counter++;
-                    //client = await listener.AcceptTcpClientAsync();
+                    
                     client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellation.Token);
 
                     /* get username */
@@ -55,6 +59,15 @@ namespace Server
                         /* add to dictionary, listbox and send userList  */
                         clientList.Add(userName, client);
 
+                        //Save user to DB
+                        dbOperator.SaveUser(new User
+                        {
+                            UserId = userId,
+                            Login = userName,
+                            Password = pwd
+                        });
+
+                        //Update UI
                         UserAddedInfoEvent?.Invoke(userName);
                         UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
 
@@ -64,6 +77,8 @@ namespace Server
 
                         var c = new Thread(() => ServerReceive(client, userName));
                         c.Start();
+
+                        userId++;
                     }
                     else
                     {
@@ -113,7 +128,6 @@ namespace Server
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    //MessageBox.Show(ex.Message);
 
                     UpdateGUIEvent?.Invoke("Client Disconnected: " + userName);
                     announce("Client Disconnected: " + userName + "$", userName, false);
@@ -145,7 +159,6 @@ namespace Server
             catch (SocketException ex)
             {
                 Console.WriteLine(ex.Message);
-                //MessageBox.Show(ex.Message);
             }
         }
 
@@ -162,6 +175,14 @@ namespace Server
 
                     if (flag)
                     {
+                        dbOperator.SaveMessage(new Message
+                        {
+                            MessageId = msgId,
+                            Msg = msg,
+                            DateIn = DateTime.Now,
+                            SenderId = userId
+                        }) ;
+
                         switch (msg)
                         {
                             case "DATE":
@@ -190,11 +211,11 @@ namespace Server
                     broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
                     broadcastStream.Flush();
                     chat.Clear();
+                    msgId++;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
                 Console.WriteLine(ex.Message);
             }
         }
@@ -215,7 +236,6 @@ namespace Server
             }
             catch (SocketException ex)
             {
-                //MessageBox.Show(ex.Message);
                 Console.WriteLine(ex.Message);
             }
 

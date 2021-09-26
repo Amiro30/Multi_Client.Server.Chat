@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Models
 {
@@ -11,13 +7,13 @@ namespace Server.Models
     {
         public int MessageId { get; set; }
         public string Msg { get; set; }
-        public DateTime DateIn { get; set; }
-        public DateTime DateOut { get; set; }
+        public DateTime? DateIn { get; set; }
+        public DateTime? DateOut { get; set; }
 
-        [ForeignKey("User")]
+        //[ForeignKey("UserId")]
         public int SenderId { get; set; }
 
-        [ForeignKey("User")]
+        //[ForeignKey("UserId")]
         public int RcptId { get; set; }
 
 

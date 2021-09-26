@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+using Server.Operators;
 
 namespace Server
 {
@@ -48,8 +49,6 @@ namespace Server
 
         private void _srv_UserAddedEvent(string userName)
         {
-            //usersList.Items.Add(userName);
-            
             usersList.BeginInvoke(new ThreadStart(delegate
             {
                 usersList.Items.Add(userName);

@@ -45,6 +45,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,7 +69,8 @@
     <Compile Include="Helper.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\User.cs" />
-    <Compile Include="ServerOperator.cs" />
+    <Compile Include="Operators\DbOperator.cs" />
+    <Compile Include="Operators\ServerOperator.cs" />
     <Compile Include="ServerStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="formServer.resx">
