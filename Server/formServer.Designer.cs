@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.btnStart = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.usersList = new System.Windows.Forms.ListBox();
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.disconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblOnline = new System.Windows.Forms.Label();
@@ -70,19 +70,25 @@
             // 
             // listBox1
             // 
-            this.listBox1.ContextMenuStrip = this.contextMenuStrip;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(277, 124);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(146, 108);
-            this.listBox1.TabIndex = 3;
+            this.usersList.ContextMenuStrip = this.contextMenuStrip;
+            this.usersList.FormattingEnabled = true;
+            this.usersList.Location = new System.Drawing.Point(277, 124);
+            this.usersList.Name = "usersList";
+            this.usersList.Size = new System.Drawing.Size(146, 108);
+            this.usersList.TabIndex = 3;
+            this.usersList.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // contextMenuStrip
             // 
             this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.disconnectToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip1";
-            this.contextMenuStrip.Size = new System.Drawing.Size(134, 26);
+            this.contextMenuStrip.Size = new System.Drawing.Size(68, 26);
+            // 
+            // disconnectToolStripMenuItem
+            // 
+            this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(67, 22);
             // 
             // lblOnline
             // 
@@ -143,7 +149,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblOnline);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.usersList);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnStart);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -160,7 +166,7 @@
 
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox usersList;
         private System.Windows.Forms.Label lblOnline;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

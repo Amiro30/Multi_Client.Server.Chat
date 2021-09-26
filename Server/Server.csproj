@@ -64,8 +64,10 @@
     <Compile Include="formServer.Designer.cs">
       <DependentUpon>formServer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="ServerOperator.cs" />
     <Compile Include="ServerStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="formServer.resx">
