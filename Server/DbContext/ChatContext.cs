@@ -12,7 +12,31 @@ namespace Server.DbContext
         public ChatContext() : base("ChatContext")
         {
             Database.CreateIfNotExists();
+            //Database.SetInitializer<ChatContext>(new DropCreateDatabaseAlways<ChatContext>());
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<User>()
+                .Property(e => e.Password)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.Messages)
+                .WithRequired(e => e.User)
+                .HasForeignKey(e => e.RcptId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.Messages)
+                .WithRequired(e => e.User)
+                .HasForeignKey(e => e.SenderId)
+                .WillCascadeOnDelete(false);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+       
     }
 }

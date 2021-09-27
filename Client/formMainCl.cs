@@ -130,7 +130,7 @@ namespace Client
                             msg();
                             break; 
 
-                        case "denied":
+                        case "ACHTUNG!":
                             readData = "" + parts[1];
                             msg();
 

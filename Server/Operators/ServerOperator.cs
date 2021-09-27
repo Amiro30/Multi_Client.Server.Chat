@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Server.Models;
-using Server.Operators;
 
 
 namespace Server.Operators
@@ -26,9 +25,8 @@ namespace Server.Operators
         //resets the token when the server restarts
         CancellationTokenSource cancellation = new CancellationTokenSource();
         Helper sHelper = new Helper();
-        DbOperator dbOperator = new DbOperator();
-        private int userId = 1;
-        private int msgId = 1;
+        ChatRepository dbRepository = new ChatRepository();
+      
 
         Dictionary<string, TcpClient> clientList = new Dictionary<string, TcpClient>();
         List<string> chat = new List<string>();
@@ -42,7 +40,6 @@ namespace Server.Operators
             {
                 while (true)
                 {
-                    
                     client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellation.Token);
 
                     /* get username */
@@ -54,15 +51,14 @@ namespace Server.Operators
                     var userName = parts[0];
                     var pwd = parts[1];
 
-                    if (Auth.Login(userName, pwd))
+                    if (Auth.Login(userName, pwd) && !dbRepository.UserExist(userName))
                     {
                         /* add to dictionary, listbox and send userList  */
                         clientList.Add(userName, client);
 
                         //Save user to DB
-                        dbOperator.SaveUser(new User
+                        dbRepository.SaveUser(new User
                         {
-                            UserId = userId,
                             Login = userName,
                             Password = pwd
                         });
@@ -77,12 +73,25 @@ namespace Server.Operators
 
                         var c = new Thread(() => ServerReceive(client, userName));
                         c.Start();
+                    }
+                    else if(Auth.Login(userName, pwd) && dbRepository.UserExist(userName))
+                    {
+                        /* add to dictionary, listbox and send userList  */
+                        clientList.Add(userName, client);
+                        //Update UI
+                        UserAddedInfoEvent?.Invoke(userName);
+                        UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
 
-                        userId++;
+                        announce(userName + " Joined ", userName, false);
+
+                        await Task.Delay(1000).ContinueWith(t => sendUsersList());
+
+                        var c = new Thread(() => ServerReceive(client, userName));
+                        c.Start();
                     }
                     else
                     {
-                        chat.Add("denied");
+                        chat.Add("ACHTUNG!");
                         chat.Add($"{userName}:  Access Denied.");
                         var broadcastBytes = sHelper.ObjectToByteArray(chat);
                         stream.Write(broadcastBytes, 0, broadcastBytes.Length);
@@ -114,7 +123,6 @@ namespace Server.Operators
                     switch (parts[0])
                     {
                         case "chat":
-
                             UserAddedInfoEvent?.Invoke(userName + ": " + parts[1] + Environment.NewLine);
                             announce(parts[1], userName, true);
                             break;
@@ -162,7 +170,7 @@ namespace Server.Operators
             }
         }
 
-        public void announce(string msg, string uName, bool flag)
+        public async void announce(string msg, string uName, bool flag)
         {
             try
             {
@@ -175,12 +183,13 @@ namespace Server.Operators
 
                     if (flag)
                     {
-                        dbOperator.SaveMessage(new Message
+                        var user = dbRepository.GetUserId(uName);
+
+                        dbRepository.SaveMessage(new Message
                         {
-                            MessageId = msgId,
                             Msg = msg,
                             DateIn = DateTime.Now,
-                            SenderId = userId
+                            SenderId = user.UserId
                         }) ;
 
                         switch (msg)
@@ -211,7 +220,6 @@ namespace Server.Operators
                     broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
                     broadcastStream.Flush();
                     chat.Clear();
-                    msgId++;
                 }
             }
             catch (Exception ex)
@@ -224,6 +232,7 @@ namespace Server.Operators
         {
             try
             {
+                dbRepository.Dispose();
                 listener.Stop();
                 UpdateGUIEvent?.Invoke("Server Stopped");
 
@@ -238,9 +247,7 @@ namespace Server.Operators
             {
                 Console.WriteLine(ex.Message);
             }
-
-            //cancellation.Cancel();
-            //client.Close();   
         }
+
     }
 }

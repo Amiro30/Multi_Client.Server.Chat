@@ -69,7 +69,7 @@
     <Compile Include="Helper.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\User.cs" />
-    <Compile Include="Operators\DbOperator.cs" />
+    <Compile Include="Operators\ChatRepository.cs" />
     <Compile Include="Operators\ServerOperator.cs" />
     <Compile Include="ServerStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
