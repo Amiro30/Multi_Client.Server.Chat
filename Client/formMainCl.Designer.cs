@@ -32,7 +32,7 @@
             this.history = new System.Windows.Forms.TextBox();
             this.input = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.usersListBox = new System.Windows.Forms.ListBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.privateChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
@@ -62,22 +62,26 @@
             // 
             // btnSend
             // 
+            this.btnSend.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.btnSend.Font = new System.Drawing.Font("Comic Sans MS", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnSend.ForeColor = System.Drawing.Color.White;
             this.btnSend.Location = new System.Drawing.Point(197, 216);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(75, 23);
             this.btnSend.TabIndex = 2;
             this.btnSend.Text = "Send";
-            this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.UseVisualStyleBackColor = false;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
-            // listBox1
+            // usersListBox
             // 
-            this.listBox1.ContextMenuStrip = this.contextMenuStrip1;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(298, 41);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(79, 134);
-            this.listBox1.TabIndex = 3;
+            this.usersListBox.ContextMenuStrip = this.contextMenuStrip1;
+            this.usersListBox.FormattingEnabled = true;
+            this.usersListBox.Location = new System.Drawing.Point(298, 41);
+            this.usersListBox.Name = "usersListBox";
+            this.usersListBox.Size = new System.Drawing.Size(79, 134);
+            this.usersListBox.TabIndex = 3;
+            this.usersListBox.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // contextMenuStrip1
             // 
@@ -94,31 +98,35 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Comic Sans MS", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label1.Location = new System.Drawing.Point(336, 25);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 13);
+            this.label1.Size = new System.Drawing.Size(45, 15);
             this.label1.TabIndex = 4;
             this.label1.Text = "Friends";
             // 
             // btnConnect
             // 
+            this.btnConnect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.btnConnect.Font = new System.Drawing.Font("Comic Sans MS", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnConnect.ForeColor = System.Drawing.Color.White;
             this.btnConnect.Location = new System.Drawing.Point(298, 216);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(72, 23);
             this.btnConnect.TabIndex = 5;
             this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = true;
+            this.btnConnect.UseVisualStyleBackColor = false;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
             // indicator
             // 
             this.indicator.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.indicator.Location = new System.Drawing.Point(12, 12);
+            this.indicator.Location = new System.Drawing.Point(2, 0);
             this.indicator.Name = "indicator";
-            this.indicator.Size = new System.Drawing.Size(10, 11);
+            this.indicator.Size = new System.Drawing.Size(28, 22);
             this.indicator.TabIndex = 6;
             // 
-            // btnClear
+            // btnClr
             // 
             this.btnClr.Location = new System.Drawing.Point(252, 154);
             this.btnClr.Name = "btnClr";
@@ -141,7 +149,7 @@
             this.Controls.Add(this.input);
             this.Controls.Add(this.history);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.usersListBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "formMainCl";
             this.Text = "Client ";
@@ -157,7 +165,7 @@
         private System.Windows.Forms.TextBox history;
         private System.Windows.Forms.TextBox input;
         private System.Windows.Forms.Button btnSend;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox usersListBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;

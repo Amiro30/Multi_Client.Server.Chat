@@ -173,7 +173,12 @@ namespace Server.Operators
             try
             {
                 byte[] userList = new byte[1024];
-                userList = sHelper.ObjectToByteArray(clientList.Select(x => x.Key).ToList());
+                List<string> users = new List<string>();
+
+                users = clientList.Select(x => x.Key).ToList();
+                users.Insert(0, "userList");
+
+                userList = sHelper.ObjectToByteArray(users);
 
                 foreach (var client in clientList)
                 {

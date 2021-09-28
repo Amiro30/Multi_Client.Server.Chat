@@ -93,10 +93,10 @@ namespace Client
         {
             this.Invoke((MethodInvoker)delegate
             {
-                listBox1.Items.Clear();
+                usersListBox.Items.Clear();
                 for (int i = 1; i < parts.Count; i++)
                 {
-                    listBox1.Items.Add(parts[i]);
+                    usersListBox.Items.Add(parts[i]);
 
                 }
             });
@@ -234,7 +234,7 @@ namespace Client
                 bool part2 = (s.Available == 0);
                 if (part1 && part2)
                 {
-                    indicator.BackColor = Color.Red;
+                    indicator.BackColor = Color.IndianRed;
                     this.Invoke((MethodInvoker)delegate // cross threads
                     {
                         btnConnect.Enabled = true;
@@ -263,6 +263,11 @@ namespace Client
         {
             history.SelectionStart = history.TextLength;
             history.ScrollToCaret();
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
