@@ -33,6 +33,11 @@ namespace Server.Operators
 
         public async void StartServer()
         {
+            if (dbRepository.IsDisposed())
+            {
+                dbRepository = new ChatRepository();
+            }
+
             listener.Start();
             UpdateGUIEvent?.Invoke($"Server Started at {listener.LocalEndpoint}{Environment.NewLine} Waiting for Clients");
 
@@ -67,11 +72,11 @@ namespace Server.Operators
                         UserAddedInfoEvent?.Invoke(userName);
                         UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
 
-                        announce(userName + " Joined ", userName, false);
+                        BroadCastMessage(userName + " Joined ", userName, false);
 
-                        await Task.Delay(1000).ContinueWith(t => sendUsersList());
+                        await Task.Delay(1000).ContinueWith(t => SendUsersList());
 
-                        var c = new Thread(() => ServerReceive(client, userName));
+                        var c = new Thread(() => ServerReceiveData(client, userName));
                         c.Start();
                     }
                     else if(Auth.Login(userName, pwd) && dbRepository.UserExist(userName))
@@ -82,11 +87,11 @@ namespace Server.Operators
                         UserAddedInfoEvent?.Invoke(userName);
                         UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
 
-                        announce(userName + " Joined ", userName, false);
+                        BroadCastMessage(userName + " Joined ", userName, false);
 
-                        await Task.Delay(1000).ContinueWith(t => sendUsersList());
+                        await Task.Delay(1000).ContinueWith(t => SendUsersList());
 
-                        var c = new Thread(() => ServerReceive(client, userName));
+                        var c = new Thread(() => ServerReceiveData(client, userName));
                         c.Start();
                     }
                     else
@@ -108,7 +113,7 @@ namespace Server.Operators
 
         }
 
-        public void ServerReceive(TcpClient client, String userName)
+        public void ServerReceiveData(TcpClient client, String userName)
         {
             byte[] data = new byte[1000];
             while (true)
@@ -124,10 +129,8 @@ namespace Server.Operators
                     {
                         case "chat":
                             UserAddedInfoEvent?.Invoke(userName + ": " + parts[1] + Environment.NewLine);
-                            announce(parts[1], userName, true);
-                            break;
 
-                        case "some case":
+                            BroadCastMessage(parts[1], userName, true);
                             break;
                     }
 
@@ -138,17 +141,17 @@ namespace Server.Operators
                     Console.WriteLine(ex.Message);
 
                     UpdateGUIEvent?.Invoke("Client Disconnected: " + userName);
-                    announce("Client Disconnected: " + userName + "$", userName, false);
+                    BroadCastMessage("Client Disconnected: " + userName + "$", userName, false);
                     clientList.Remove(userName);
 
                     UserRemoveEvent?.Invoke(userName);
-                    sendUsersList();
+                    SendUsersList();
                     break;
                 }
             }
         }
 
-        public void sendUsersList()
+        public void SendUsersList()
         {
             try
             {
@@ -170,27 +173,32 @@ namespace Server.Operators
             }
         }
 
-        public async void announce(string msg, string uName, bool flag)
+        public async void BroadCastMessage(string msg, string uName, bool flag)
         {
             try
             {
-                foreach (var Item in clientList)
+                //broadcasting chat msgs to all clients
+                foreach (var connectedClient in clientList)
                 {
                     TcpClient broadcastSocket;
-                    broadcastSocket = (TcpClient)Item.Value;
+                    broadcastSocket = (TcpClient)connectedClient.Value;
                     NetworkStream broadcastStream = broadcastSocket.GetStream();
                     Byte[] broadcastBytes = null;
 
                     if (flag)
                     {
-                        var user = dbRepository.GetUserId(uName);
-
-                        dbRepository.SaveMessage(new Message
+                        if (connectedClient.Key == uName)
                         {
-                            Msg = msg,
-                            DateIn = DateTime.Now,
-                            SenderId = user.UserId
-                        }) ;
+                            var user = dbRepository.GetUserId(uName);
+
+                            //save msg to Db only for sender
+                            dbRepository.SaveMessage(new Message
+                            {
+                                Msg = msg,
+                                DateIn = DateTime.Now,
+                                SenderId = user.UserId
+                            });
+                        }
 
                         switch (msg)
                         {
@@ -232,7 +240,6 @@ namespace Server.Operators
         {
             try
             {
-                dbRepository.Dispose();
                 listener.Stop();
                 UpdateGUIEvent?.Invoke("Server Stopped");
 
@@ -242,6 +249,7 @@ namespace Server.Operators
                     broadcastSocket = (TcpClient)Item.Value;
                     broadcastSocket.Close();
                 }
+                dbRepository.Dispose();
             }
             catch (SocketException ex)
             {

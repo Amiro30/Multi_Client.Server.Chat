@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Server.DbContext;
 using Server.Models;
 
@@ -20,10 +21,10 @@ namespace Server.Operators
             _db.SaveChanges();
         }
 
-        public async void SaveMessage(Message msg)
+        public void  SaveMessage(Message msg)
         {
             _db.Messages.Add(msg);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
         }
 
         public User GetUserId(string name)
@@ -54,6 +55,11 @@ namespace Server.Operators
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public bool IsDisposed()
+        {
+            return disposed;
         }
     }
 }
