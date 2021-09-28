@@ -5,12 +5,14 @@ namespace Client
 {
     public partial class formLogin : Form
     {
+        //bool userExist = false;
+        public bool UserExist  { get; set; }
 
         public formLogin()
         {
             InitializeComponent();
-            btnAdd.Enabled = false;
-
+            LoginBtn.Enabled = false;
+            RegisterBtn.Enabled = false;
         }
 
         public String GetName()
@@ -31,16 +33,25 @@ namespace Client
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            btnAdd.Enabled = true; 
+            LoginBtn.Enabled = true;
+            RegisterBtn.Enabled = true;
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
-        {
-        }
+       
 
         private void lblName_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void RegisterBtn_Click(object sender, EventArgs e)
+        {
+            UserExist = false;
+        }
+
+        private void LoginBtn_Click(object sender, EventArgs e)
+        {
+            UserExist = true;
         }
     }
 }

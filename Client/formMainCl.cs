@@ -18,12 +18,14 @@ namespace Client
         Thread clientThread;
         String _name = null;
         String _pass = null;
+        String _userExist = null;
         List<string> chat = new List<string>();
 
-        public void setCredentials(string login, string pass)
+        public void setCredentials(string login, string pass, bool userExist)
         {
             _name = login;
             _pass = pass;
+            _userExist = userExist.ToString();
         }
 
         public formMainCl()
@@ -69,6 +71,7 @@ namespace Client
                 //byte[] outStream = Encoding.ASCII.GetBytes(_name + "$" + _pass + "*");
                 chat.Add(_name);
                 chat.Add(_pass);
+                chat.Add(_userExist);
                 byte[] outStream = ObjectToByteArray(chat);
 
 

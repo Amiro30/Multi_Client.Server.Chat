@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auth.cs" />
     <Compile Include="DbContext\ChatContext.cs" />
     <Compile Include="formServer.cs">
       <SubType>Form</SubType>

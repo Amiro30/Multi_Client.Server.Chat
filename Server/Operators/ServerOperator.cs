@@ -55,53 +55,70 @@ namespace Server.Operators
                     var parts = sHelper.ByteArrayToObject(creds) as List<string>;                 
                     var userName = parts[0];
                     var pwd = parts[1];
+                    var userExist = parts[2];
 
-                    if (Auth.Login(userName, pwd) && !dbRepository.UserExist(userName))
+                    if (userExist == "True")
                     {
-                        /* add to dictionary, listbox and send userList  */
-                        clientList.Add(userName, client);
-
-                        //Save user to DB
-                        dbRepository.SaveUser(new User
+                        if (dbRepository.UserExist(userName))
                         {
-                            Login = userName,
-                            Password = pwd
-                        });
+                            /* add to dictionary, listbox and send userList  */
+                            clientList.Add(userName, client);
+                            //Update UI
+                            UserAddedInfoEvent?.Invoke(userName);
+                            UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
 
-                        //Update UI
-                        UserAddedInfoEvent?.Invoke(userName);
-                        UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
+                            BroadCastMessage(userName + " Joined ", userName, false);
 
-                        BroadCastMessage(userName + " Joined ", userName, false);
+                            await Task.Delay(1000).ContinueWith(t => SendUsersList());
 
-                        await Task.Delay(1000).ContinueWith(t => SendUsersList());
-
-                        var c = new Thread(() => ServerReceiveData(client, userName));
-                        c.Start();
-                    }
-                    else if(Auth.Login(userName, pwd) && dbRepository.UserExist(userName))
-                    {
-                        /* add to dictionary, listbox and send userList  */
-                        clientList.Add(userName, client);
-                        //Update UI
-                        UserAddedInfoEvent?.Invoke(userName);
-                        UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
-
-                        BroadCastMessage(userName + " Joined ", userName, false);
-
-                        await Task.Delay(1000).ContinueWith(t => SendUsersList());
-
-                        var c = new Thread(() => ServerReceiveData(client, userName));
-                        c.Start();
+                            var c = new Thread(() => ServerReceiveData(client, userName));
+                            c.Start();
+                        }
+                        else
+                        {
+                            chat.Add("ACHTUNG!");
+                            chat.Add($"{userName}: User name or password incorrect.");
+                            var broadcastBytes = sHelper.ObjectToByteArray(chat);
+                            stream.Write(broadcastBytes, 0, broadcastBytes.Length);
+                            stream.Flush();
+                            chat.Clear();
+                        }
                     }
                     else
                     {
-                        chat.Add("ACHTUNG!");
-                        chat.Add($"{userName}:  Access Denied.");
-                        var broadcastBytes = sHelper.ObjectToByteArray(chat);
-                        stream.Write(broadcastBytes, 0, broadcastBytes.Length);
-                        stream.Flush();
-                        chat.Clear();
+                        //check the user have not registered yet
+                        if (!dbRepository.UserExist(userName))
+                        {
+                            /* add to dictionary, listbox and send userList  */
+                            clientList.Add(userName, client);
+
+                            //Save user to DB
+                            dbRepository.SaveUser(new User
+                            {
+                                Login = userName,
+                                Password = pwd
+                            });
+
+                            //Update UI
+                            UserAddedInfoEvent?.Invoke(userName);
+                            UpdateGUIEvent?.Invoke("Connected to user " + userName + " - " + client.Client.RemoteEndPoint);
+
+                            BroadCastMessage(userName + " Joined ", userName, false);
+
+                            await Task.Delay(1000).ContinueWith(t => SendUsersList());
+
+                            var c = new Thread(() => ServerReceiveData(client, userName));
+                            c.Start();
+                        }
+                        else if (dbRepository.UserExist(userName))
+                        {
+                            chat.Add("ACHTUNG!");
+                            chat.Add($"{userName}:  User with same name already registered.");
+                            var broadcastBytes = sHelper.ObjectToByteArray(chat);
+                            stream.Write(broadcastBytes, 0, broadcastBytes.Length);
+                            stream.Flush();
+                            chat.Clear();
+                        }
                     }
                 }
             }

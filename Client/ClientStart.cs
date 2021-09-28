@@ -15,13 +15,13 @@ namespace Client
             Application.SetCompatibleTextRenderingDefault(false);
 
             formLogin formLogin = new formLogin();
-
+            
                 if (formLogin.ShowDialog() == DialogResult.OK)
                 {
                     if (formLogin.GetName() != "" && formLogin.GetPass() != "")
                     {
                         formMainCl form = new formMainCl();
-                        form.setCredentials(formLogin.GetName(), formLogin.GetPass());
+                        form.setCredentials(formLogin.GetName(), formLogin.GetPass(), formLogin.UserExist);
                     Application.Run(form);
                     }
                     else
